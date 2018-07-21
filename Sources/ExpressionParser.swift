@@ -110,19 +110,19 @@ final class ExpressionParser {
             case .identifier(identifierStart: let identifierStart):
                 switch c {
                 case " ", "\r", "\n", "\r\n", "\t":
-                    let identifier = string.substring(with: identifierStart..<i)
+                    let identifier = String(string[identifierStart..<i])
                     state = .doneExpressionPlusWhiteSpace(expression: Expression.identifier(identifier: identifier))
                 case ".":
-                    let identifier = string.substring(with: identifierStart..<i)
+                    let identifier = String(string[identifierStart..<i])
                     state = .waitingForScopingIdentifier(baseExpression: Expression.identifier(identifier: identifier))
                 case "(":
-                    let identifier = string.substring(with: identifierStart..<i)
+                    let identifier = String(string[identifierStart..<i])
                     filterExpressionStack.append(Expression.identifier(identifier: identifier))
                     state = .waitingForAnyExpression
                 case ")":
                     if let filterExpression = filterExpressionStack.last {
                         filterExpressionStack.removeLast()
-                        let identifier = string.substring(with: identifierStart..<i)
+                        let identifier = String(string[identifierStart..<i])
                         let expression = Expression.filter(filterExpression: filterExpression, argumentExpression: Expression.identifier(identifier: identifier), partialApplication: false)
                         state = .doneExpression(expression: expression)
                     } else {
@@ -131,7 +131,7 @@ final class ExpressionParser {
                 case ",":
                     if let filterExpression = filterExpressionStack.last {
                         filterExpressionStack.removeLast()
-                        let identifier = string.substring(with: identifierStart..<i)
+                        let identifier = String(string[identifierStart..<i])
                         filterExpressionStack.append(Expression.filter(filterExpression: filterExpression, argumentExpression: Expression.identifier(identifier: identifier), partialApplication: true))
                         state = .waitingForAnyExpression
                     } else {
@@ -144,22 +144,22 @@ final class ExpressionParser {
             case .scopingIdentifier(identifierStart: let identifierStart, baseExpression: let baseExpression):
                 switch c {
                 case " ", "\r", "\n", "\r\n", "\t":
-                    let identifier = string.substring(with: identifierStart..<i)
+                    let identifier = String(string[identifierStart..<i])
                     let scopedExpression = Expression.scoped(baseExpression: baseExpression, identifier: identifier)
                     state = .doneExpressionPlusWhiteSpace(expression: scopedExpression)
                 case ".":
-                    let identifier = string.substring(with: identifierStart..<i)
+                    let identifier = String(string[identifierStart..<i])
                     let scopedExpression = Expression.scoped(baseExpression: baseExpression, identifier: identifier)
                     state = .waitingForScopingIdentifier(baseExpression: scopedExpression)
                 case "(":
-                    let identifier = string.substring(with: identifierStart..<i)
+                    let identifier = String(string[identifierStart..<i])
                     let scopedExpression = Expression.scoped(baseExpression: baseExpression, identifier: identifier)
                     filterExpressionStack.append(scopedExpression)
                     state = .waitingForAnyExpression
                 case ")":
                     if let filterExpression = filterExpressionStack.last {
                         filterExpressionStack.removeLast()
-                        let identifier = string.substring(with: identifierStart..<i)
+                        let identifier = String(string[identifierStart..<i])
                         let scopedExpression = Expression.scoped(baseExpression: baseExpression, identifier: identifier)
                         let expression = Expression.filter(filterExpression: filterExpression, argumentExpression: scopedExpression, partialApplication: false)
                         state = .doneExpression(expression: expression)
@@ -169,7 +169,7 @@ final class ExpressionParser {
                 case ",":
                     if let filterExpression = filterExpressionStack.last {
                         filterExpressionStack.removeLast()
-                        let identifier = string.substring(with: identifierStart..<i)
+                        let identifier = String(string[identifierStart..<i])
                         let scopedExpression = Expression.scoped(baseExpression: baseExpression, identifier: identifier)
                         filterExpressionStack.append(Expression.filter(filterExpression: filterExpression, argumentExpression: scopedExpression, partialApplication: true))
                         state = .waitingForAnyExpression
