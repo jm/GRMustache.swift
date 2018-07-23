@@ -28,27 +28,24 @@ class SuiteTestCase: XCTestCase {
     
     func runTestsFromResource(_ name: String, directory: String) {
         let testBundle = Bundle(for: type(of: self))
-        let path: String! = testBundle.path(forResource: name, ofType: nil, inDirectory: directory)
-        if path == nil {
+        guard let path = testBundle.path(forResource: name, ofType: nil, inDirectory: directory) else {
             XCTFail("No such test suite \(directory)/\(name)")
             return
         }
         
-        let data: Data! = try? Data(contentsOf: URL(fileURLWithPath: path))
-        if data == nil {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
             XCTFail("No test suite in \(path)")
             return
         }
         
         let testSuite = try! JSONSerialization.jsonObject(with: data, options:JSONSerialization.ReadingOptions(rawValue: 0)) as! NSDictionary
         
-        let tests = testSuite["tests"] as! NSArray!
-        if tests == nil {
+        guard let tests = testSuite["tests"] as? NSArray else {
             XCTFail("Missing tests in \(path)")
             return
         }
         
-        for testDictionary in tests! {
+        for testDictionary in tests {
             let test = Test(path: path, dictionary: testDictionary as! NSDictionary)
             test.run()
         }
@@ -193,7 +190,7 @@ class SuiteTestCase: XCTestCase {
         func testRendering(_ template: Template) {
             do {
                 let rendering = try template.render(renderedValue)
-                if let expectedRendering = expectedRendering as String! {
+                if let expectedRendering = expectedRendering {
                     if expectedRendering != rendering {
                         XCTAssertEqual(rendering, expectedRendering, "Unexpected rendering of \(description)")
                     }
@@ -267,7 +264,7 @@ class SuiteTestCase: XCTestCase {
                     }
                 }
                 
-                templatesPaths.append(templatesPath, encoding)
+                templatesPaths.append((templatesPath, encoding))
             }
             
             return templatesPaths
